@@ -36,3 +36,14 @@ The main script is RandomPasswordv3.sh, this script will check for a local accou
 
 In order to secure the Password, we are encrypting the password with a random key, this should be site specific, i.e. do this yourself!  
 
+Finally, create a policy to run at your preferred interval maybe once a week. And you can choose to update the inventory on this policy, or simply allow the default "update Inventory" policy to capture the password. But if you choose the latter then the password may not be updated within jamf for up to 7 days (default setting).
+
+Policy setup
+Name        - Randomise Password  
+Frequency   - Once every week  
+Trigger     - Reoccuring check-in  
+Scope       - All Computers  
+Payload     - RandomPasswordv3.sh  
+                Parameter 4 - Salted Key  
+                Parameter 5 - Phrase Key  
+            - Update Inventory  

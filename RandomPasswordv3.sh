@@ -24,33 +24,53 @@
 	# password expiry stolen from
 	# https://www.jamf.com/jamf-nation/discussions/9559
 	
-# When Run this will update the password for <username> and update it to a random password
-# How to Use
-	###############################################################
-	# Designed as use through Extension Attributes
-	# Set the userName to the account name you want to randomise
-	# Then set the number of days to randomise the password as.
-	# The Jamf Server will run this Extension attribute at minimum
-	# during the default "Update Inventory" policy. The default policy 
-	# is every week meaning that a password will be randomised once 
-	# every week. By using this Scipt we can check the last time the 
-	# password was set and only alter it only if past the expiry date.
-	#
-	###############################################################
 
 # Username to randomise the password
 userName="test"
+fullName="IT Support"
+home="/var/${userName}"
 # Reset the Password when it is Over xx days old
-passWDPolicy="90"
+passWDPolicy="14"
+#EncryptedPasswordFile
+prefFile="/var/db/.encryptedD8.plist"
+saltKey="${4}"
+phraseKey="${5}"
+#saltKey="063f7f8eb687cde2"
+#phraseKey="7d7353d9547a8af1bf81d1be"
+
+if [[ -z "${saltKey}" || -z "${phraseKey}" ]];then
+	echo "Keys Missing, exiting."
+	exit 1
+fi
+
+function GenerateEncryptedString() {
+# Usage ~$ GenerateEncryptedString "String"
+echo "${1}" | openssl enc -aes256 -a -A -S "${saltKey}" -k "${phraseKey}"
+}
 
 if id "$userName" >/dev/null 2>&1; then
 	echo "Notice: User exists, continuing"
 	passwordDateTime=$( dscl . read /Users/${userName} accountPolicyData | sed 1,2d | /usr/bin/xpath "/plist/dict/real[preceding-sibling::key='passwordLastSetTime'][1]/text()" 2> /dev/null | sed -e 's/\.[0-9]*//g' )
-	((passwordAgeDays = ($(date +%s) - $passwordDateTime) / 86400 ))
+	echo "testUser is $passwordDateTime"
+now_date=$(date +%s)
+passwordAgeDays=$(( ($now_date - $passwordDateTime) / 86400 ))
+	echo "The User ${userName} password in Days is $passwordAgeDays"
+	
 	if [[ "$passwordAgeDays" -gt ${passWDPolicy} ]]; then
-		newPass=`cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
-		#jamf changePassword -username ${userName} -password "${newPass}"
-		sudo dscl . -passwd /Users/${userName} "${newPass}"
-		echo "<result>${newPass}</result>"
+		newPass=`cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9!@#*' | fold -w 32 | head -n 1`
+        sysadminctl -deleteUser ${userName}
+        sysadminctl -addUser ${userName} -fullName "${fullName}" -UID 500 -password ${newPass} -home ${home} -admin
+		createhomedir -c 2>&1
+		dscl . -authonly ${userName} "${newPass}"
+		if [[ $? ]];then
+			echo "Successful Creation of account with new Password."
+			encryptedString=$(GenerateEncryptedString "${newPass}")
+			defaults write "${prefFile}" pkey "${encryptedString}"
+			echo "The encrypted ${userName} users password is ${newPass}"
+			echo "The User ${userName} Password Age (EPOCH) is $passwordDateTime"
+			echo "Encrypted Sting: ${encryptedString}"
+		else
+			echo "FAILED Creation of account with new Password."
+		fi
 	fi
 fi

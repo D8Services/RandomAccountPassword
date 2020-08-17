@@ -19,7 +19,11 @@
 	#
 	###############################################################
 	#
+	# Part two of the Random Account Password process
+	# https://github.com/D8Services/RandomAccountPassword
 prefFile="/var/db/.encryptedD8.plist"
+
+# the folowing must match exactly the saltKey and PhraseKey passed to the forst script.
 saltKey="063f7f8eb687cde2"
 phraseKey="7d7353d9547a8af1bf81d1be"
 

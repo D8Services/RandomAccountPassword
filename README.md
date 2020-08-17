@@ -23,9 +23,9 @@ phraseKey="${5}"          - Parameter 5 from Jamf with Passcode Key
 You may see above the salted key and phrase key. These two items are returned from running the following commands on a Mac;
 
 saltKey
-openssl rand -hex 8
+```openssl rand -hex 8```
 phraseKey
-openssl rand -hex 12
+```openssl rand -hex 12```
 
 ## Scripts
 RandomPassEA_v3.sh

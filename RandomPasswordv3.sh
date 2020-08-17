@@ -17,6 +17,7 @@
 	#	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#
 	# written by Tomos @ D8 Services Ltd Syd / HKG
+	# https://github.com/D8Services/RandomAccountPassword
 	###############################################################
 	#
 	# cat Command brutally and braisenly stolen/utilised from the following chat on Github
@@ -25,7 +26,8 @@
 	# https://www.jamf.com/jamf-nation/discussions/9559
 	
 
-# Username to randomise the password
+# Username to randomise the password Customise the following but ensure the saltKey and 
+# phraseKey are copied to the EA script
 userName="test"
 fullName="IT Support"
 home="/var/${userName}"
@@ -33,6 +35,8 @@ home="/var/${userName}"
 passWDPolicy="14"
 #EncryptedPasswordFile
 prefFile="/var/db/.encryptedD8.plist"
+
+# Do not edit below this line
 saltKey="${4}"
 phraseKey="${5}"
 #saltKey="063f7f8eb687cde2"

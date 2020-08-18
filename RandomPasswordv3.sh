@@ -59,14 +59,14 @@ if id "$userName" >/dev/null 2>&1; then
 	echo "ERROR: $userName is missing 'passwordLastSetTime', exiting."
 	exit 2
 	fi
-now_date=$(date +%s)
-passwordAgeDays=$(( ($now_date - $passwordDateTime) / 86400 ))
+	now_date=$(date +%s)
+	passwordAgeDays=$(( ($now_date - $passwordDateTime) / 86400 ))
 	echo "The User ${userName} password in Days is $passwordAgeDays"
 	
 	if [[ "$passwordAgeDays" -gt ${passWDPolicy} ]]; then
 		newPass=`cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9!@#*' | fold -w 32 | head -n 1`
-        sysadminctl -deleteUser ${userName}
-        sysadminctl -addUser ${userName} -fullName "${fullName}" -UID 500 -password ${newPass} -home ${home} -admin
+        	sysadminctl -deleteUser ${userName}
+		sysadminctl -addUser ${userName} -fullName "${fullName}" -UID 500 -password ${newPass} -home ${home} -admin
 		createhomedir -c 2>&1
 		dscl . -authonly ${userName} "${newPass}"
 		if [[ $? ]];then

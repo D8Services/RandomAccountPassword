@@ -55,7 +55,10 @@ echo "${1}" | openssl enc -aes256 -a -A -S "${saltKey}" -k "${phraseKey}"
 if id "$userName" >/dev/null 2>&1; then
 	echo "Notice: User exists, continuing"
 	passwordDateTime=$( dscl . read /Users/${userName} accountPolicyData | sed 1,2d | /usr/bin/xpath "/plist/dict/real[preceding-sibling::key='passwordLastSetTime'][1]/text()" 2> /dev/null | sed -e 's/\.[0-9]*//g' )
-	echo "testUser is $passwordDateTime"
+	if [[ -z ${passwordDateTime} ]];then
+	echo "ERROR: $userName is missing 'passwordLastSetTime', exiting."
+	exit 2
+	fi
 now_date=$(date +%s)
 passwordAgeDays=$(( ($now_date - $passwordDateTime) / 86400 ))
 	echo "The User ${userName} password in Days is $passwordAgeDays"

@@ -1,5 +1,11 @@
 #!/bin/bash
-
+		############## WARNING #################
+		# This script will erase a useraccount #
+		# based on your userName Variable      #
+		# within this script. PLEASE ENSURE    #
+		# YOU KNOW WHAT YOU ARE DOING.         #
+		#        YOU HAVE BEEN WARNED.         #
+		########################################
 
 	###############################################################
 	#	Copyright (c) 2018, D8 Services Ltd.  All rights reserved.  

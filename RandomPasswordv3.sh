@@ -1,7 +1,7 @@
 #!/bin/bash
 
 	###############################################################
-	#	Copyright (c) 2018, D8 Services Ltd.  All rights reserved.  
+	#	Copyright (c) 2020, D8 Services Ltd.  All rights reserved.  
 	#											
 	#	
 	#	THIS SOFTWARE IS PROVIDED BY D8 SERVICES LTD. "AS IS" AND ANY
@@ -96,8 +96,6 @@ if id "$userName" >/dev/null 2>&1; then
 		dscl . -authonly ${userName} "${newPass}"
 		if [[ $? ]];then
 			echo "Successful password Change of account \"${userName}\" with new Password."
-			encryptedString=$(GenerateEncryptedString "${newPass}")
-			defaults write "${prefFile}" pkey "${encryptedString}"
 			echo "The User ${userName} Password Age (EPOCH) is $passwordDateTime"
 		else
 			echo "FAILED to Reset account \"${userName}\" with a new Password."

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 	###############################################################
-	#	Copyright (c) 2020, D8 Services Ltd.  All rights reserved.  
+	#	Copyright (c) 2018, D8 Services Ltd.  All rights reserved.  
 	#											
 	#	
 	#	THIS SOFTWARE IS PROVIDED BY D8 SERVICES LTD. "AS IS" AND ANY
@@ -88,15 +88,16 @@ if id "$userName" >/dev/null 2>&1; then
 	echo "The User ${userName} password in Days is $passwordAgeDays"
 	
 	if [[ "$passwordAgeDays" -gt ${passWDPolicy} ]]; then
-		newPass=`cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9!@#*' | fold -w 32 | head -n 1`
-        	encryptedOldPass=$(defaults read "${prefFile}" pkey)
-            	oldPass=$(DecryptString "${encryptedOldPass}")
-		sysadminctl -resetPasswordFor "${userName}" -password "${newPass}" -adminUser "${userName}" -adminPassword "${oldPass}"
-		sysadminctl -newPassword ${newPass}" -oldPassword "${oldPass}"
+		newPass=`cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+        encryptedOldPass=$(defaults read "${prefFile}" pkey)
+        oldPass=$(DecryptString "${encryptedOldPass}")
+		su uobadmin -c sysadminctl -newPassword "${newPass}" -oldPassword "${oldPass}"
 		dscl . -authonly ${userName} "${newPass}"
 		if [[ $? ]];then
 			echo "Successful password Change of account \"${userName}\" with new Password."
-			echo "The User ${userName} Password Age (EPOCH) is $passwordDateTime"
+			encryptedString=$(GenerateEncryptedString "${newPass}")
+			defaults write "${prefFile}" pkey "${encryptedString}"
+			echo "The User \"${userName}\" Password Age (EPOCH) is $passwordDateTime"
 		else
 			echo "FAILED to Reset account \"${userName}\" with a new Password."
 		fi
